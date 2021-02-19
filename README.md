@@ -7,7 +7,6 @@
     * [Preço](#Preço)
     * [Margem](#Margem)
     * [Observações](#Observações)
-* [Requisitos](#Requisitos)
 * [Instalação](#Instalação)
 * [Endpoints](#Endpoints)
 
@@ -45,107 +44,87 @@ desconto, maior o potencial de valorização da ação (upside).
 - A fórmula não funciona com empresas que apresentaram prejuízos;
 - O principal critério de Benjamin Graham é o lucro, então, empresas com `LPA` ou `VPA` negativos não serão
   consideradas;
-- Isso não é uma recomendação de compra ou venda.
-
-## Requisitos
-
-Para a instalação e execução do projeto, sera necessário:
-
-- [Python](https://www.python.org/downloads)
-- [pip](https://pip.pypa.io/en/stable/installing)
+- **Isso não é uma recomendação de compra ou venda**.
 
 ## Instalação
 
-Para este exemplo, estarei utilizando o powershell. Use um terminal conforme seu sistema operacional. No terminal,
-navegue até o diretório de sua preferência, e execute:
+- Abra seu terminal, navegue até o diretório de sua preferência, e em seguida execute:
+  ```bash
+  > git clone https://github.com/GustavoSantosBr/fair-value-stocks-api.git
+  ```
 
-```bash
-> git clone https://github.com/GustavoSantosBr/fair-value-stocks-api.git
-```
+- Navegue até a pasta do projeto utilizando:
+  ```bash
+  > cd {seudiretorio}
+  ```
 
-Navegue até a pasta {seudiretorio} utilizando:
+- Em seguida, execute o comando abaixo para dar início ao contêiner do projeto:
+  ```bash
+  > docker-compose up -d
+  ```
 
-```bash
-> cd {seudiretorio} 
-```
-
-Para criar um ambiente isolado para trabalhar o projeto:
-
-```bash
-> cd python -m venv env
-```
-
-Para ativar o ambiente virtual:
-
-```bash
-> cd ./env/Scripts/activate.bat
-```
-
-Instale as depêndencias do projeto com o seguinte comando:
-
-```bash
-> pip install -r requirements.txt
-```
+- Se necessário entrar no bash do contêiner, execute:
+  ```bash
+  > docker exec -it stocks_api bash
+  ```
 
 ## Endpoints
 
-**GET** `/fair-prices`
+**GET** `/stocks/fair-prices`
 
 Busca as ações que possuem uma cotação atual menor ou igual ao preço justo calculado.
 
 - **Exemplos:**
 
-    - Request `/fair-prices`
+    - Request `/stocks/fair-prices?tickers=ITSA4&tickers=MDIA3&tickers=CPLE6`
+      
+       |  Propriedade  |    Obrigatório    |  Descrição                    |
+       |     :---      |       :---        |  :---                         |
+       |  `tickers`    |        Não        |  Uma lista/array de tickers   |
+
     - Response
        ```json
           {
-              "data": [        
-                  {
-                      "company_name": "COELCE",
-                      "ticker": "COCE5",
-                      "price": 55.87,
-                      "fair_value": 65.47,
-                      "upside": 14.66
-                  },       
-                  {
-                      "company_name": "CELESC",
-                      "ticker": "CLSC4",
-                      "price": 52.28,
-                      "fair_value": 94.69,
-                      "upside": 44.79
-                  },
-                  {
-                      "company_name": "CEMIG",
-                      "ticker": "CMIG3",
-                      "price": 16.54,
-                      "fair_value": 18.5,
-                      "upside": 10.59
-                  },
+              "data": [
                   {
                       "company_name": "COPEL",
                       "ticker": "CPLE6",
-                      "price": 67.93,
+                      "price": 63.26,
                       "fair_value": 152.8,
-                      "upside": 55.54
+                      "upside": 58.6
+                  },
+                  {
+                      "company_name": "ITAUSA",
+                      "ticker": "ITSA4",
+                      "price": 10.25,
+                      "fair_value": 10.89,
+                      "upside": 5.88
+                  },
+                  {
+                      "company_name": "M.DIAS BRANCO",
+                      "ticker": "MDIA3",
+                      "price": 30.69,
+                      "fair_value": 32.3,
+                      "upside": 4.98
                   }
               ]
           }
-      ```
-
-**POST** `/fair-prices/reports`
-
-Gerar uma planilha/relatório com as ações que possuem uma cotação atual menor ou igual ao preço justo calculado.
-O arquivo XLSX será gerado dentro do diretório `Desktop`.
-
-- **Exemplos:**
-
-    - Request `/fair-prices/reports`
-    - Response
+       ```
+  
+    - Response (quando não houver ações com preço justo)
        ```json
           {
-              "data": {
-                   "created_at": "2021-02-06T10:24:21.638064",
-                   "number_of_stocks": 134
-              }
+              "data": []
           }
        ```
+       
+       |  Propriedade      |       Tipo        |  Descrição                   |
+       |     :---          |       :---        |  :---                        |
+       |  `company_name`   |        texto      |  Nome da empresa             |
+       |  `ticker`         |        texto      |  Ticker da ação              |
+       |  `price`          |        numérico   |  Preço atual da cotação      |
+       |  `fair_value`     |        numérico   |  Preço justo                 |
+       |  `upside`         |        numérico   |  Potencial de alta do ativo  |
+
+      
+    

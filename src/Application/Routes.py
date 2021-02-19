@@ -1,9 +1,9 @@
-from flask_restful import Api
+from flask import Response
 
+from src.Application import blueprint_stocks
 from src.Application.Handler.GetAllFairValuesHandler import GetAllFairValuesHandler
-from src.Application.Handler.PostStocksSpreadsheet import PostStocksSpreadsheet
 
 
-def add_routes(application: Api):
-    application.add_resource(GetAllFairValuesHandler, "/fair-prices")
-    application.add_resource(PostStocksSpreadsheet, "/fair-prices/reports")
+@blueprint_stocks.route("/fair-prices", methods=["GET"])
+def get_fair_prices() -> Response:
+    return GetAllFairValuesHandler().get()

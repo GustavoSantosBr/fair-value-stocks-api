@@ -1,30 +1,21 @@
 from typing import List
 
 from src.Domain.DTO.StockFairValueDto import StockFairValueDto
+from src.Domain.DTO.StockParametersDto import StockParametersDto
 from src.Infrastructure.CrossCutting.StatusInvestApi.GetAllStocksHttp import GetAllStocksHttp
 from src.Service.CalculateFairValue import CalculateFairValue
+from src.Service.FilterStocks import FilterStocks
 
 
 class GetStocks:
 
-    def __init__(self):
-        self.__get_all_stocks_http = GetAllStocksHttp()
-        self.__calculate_fair_value = CalculateFairValue()
+    def __init__(self, get_all_stocks_http: GetAllStocksHttp, filter_stocks: FilterStocks,
+                 calculate_fair_value: CalculateFairValue):
+        self.__get_all_stocks_http = get_all_stocks_http
+        self.__filter_stocks = filter_stocks
+        self.__calculate_fair_value = calculate_fair_value
 
-    def get_fair_priced_stocks(self) -> List[StockFairValueDto]:
+    def get_fair_priced_stocks(self, stock_parameters: StockParametersDto) -> List[StockFairValueDto]:
         all_stocks = self.__get_all_stocks_http.get_all_stocks()
-        stocks = []
-
-        for stock in all_stocks:
-            price = stock.price
-
-            if price <= 0:
-                continue
-
-            fair_value = self.__calculate_fair_value.calculate(stock)
-
-            if fair_value == 0 or fair_value <= price:
-                continue
-
-            stocks.append(StockFairValueDto(stock.company_name, stock.ticker, price, fair_value))
-        return stocks
+        all_stocks = self.__filter_stocks.filter_stocks_by_ticker(stock_parameters.tickers, all_stocks)
+        return self.__calculate_fair_value.get_stocks_with_fair_value(all_stocks)
